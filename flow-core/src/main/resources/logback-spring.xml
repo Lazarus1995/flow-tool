@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <property name="pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"/>
+
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <springProfile name="dev,dev">
+        <root level="info">
+            <appender-ref ref="stdout"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="test,prod,local">
+        <springProperty scope="context" name="logPath" source="logging.file.path"/>
+        <springProperty scope="context" name="projectName" source="spring.application.name"/>
+        <!-- 请求日志 -->
+        <appender name="accessLogger" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${logPath}access.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${logPath}access-%d{yyyy-MM-dd}.log</fileNamePattern>
+                <maxHistory>10</maxHistory>
+            </rollingPolicy>
+            <encoder>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss};[%p];%m%n</pattern>
+            </encoder>
+            <append>true</append>
+        </appender>
+        <logger name="accessLogger" level="info" additivity="false">
+            <appender-ref ref="accessLogger"/>
+        </logger>
+
+        <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${logPath}${projectName}.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>/${logPath}${projectName}-%d{yyyy-MM-dd}.log</fileNamePattern>
+                <maxHistory>10</maxHistory>
+            </rollingPolicy>
+            <encoder>
+                <pattern>${FILE_LOG_PATTERN}</pattern>
+            </encoder>
+        </appender>
+
+        <root level="info">
+            <appender-ref ref="stdout"/>
+            <appender-ref ref="file"/>
+        </root>
+    </springProfile>
+
+</configuration>
