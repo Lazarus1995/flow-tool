@@ -1,15 +1,14 @@
-package com.sinoiov.zczhgl.flowable.service;
+package com.qu.flowcore.service;
 
-import com.sinoiov.zczhgl.common.response.BaseResponse;
-import com.sinoiov.zczhgl.flowable.entity.vo.ModelInfoVo;
+import com.qu.flowcore.entity.vo.ModelInfoVo;
 
 public interface FlowDefinitionService {
 
-    boolean exist(String processDefinitionKey);
+    Boolean exist(String processDefinitionKey);
 
-    BaseResponse getProcessDefinition(ModelInfoVo modelInfoVo);
+    Boolean getProcessDefinition(ModelInfoVo modelInfoVo);
 
-    BaseResponse<String> importBpmnModel(ModelInfoVo modelInfoVo);
+    Boolean importBpmnModel(ModelInfoVo modelInfoVo);
 
     /**
      * 删除流程定义
@@ -18,7 +17,7 @@ public interface FlowDefinitionService {
      */
     void delete(String deployId);
 
-    BaseResponse activateProcessDefinitionInstanceById(String deployId);
+    Boolean activateProcessDefinitionInstanceById(String deployId);
 
-    BaseResponse suspendProcessDefinitionInstanceById(String deployId);
+    Boolean suspendProcessDefinitionInstanceById(String deployId);
 }

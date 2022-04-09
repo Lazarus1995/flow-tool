@@ -1,4 +1,4 @@
-package com.sinoiov.zczhgl.flowable.entity.param;
+package com.qu.flowcore.entity.param;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -7,8 +7,8 @@ import lombok.Data;
 /**
  * 工作流任务删除入参类
  *
- * @author zhangkaiyong
- * @date 2021/07/31 17:21
+ * @author qu
+ * @date 2021/12/03
  */
 @Data
 @ApiModel(description = "工作流任务删除入参类")

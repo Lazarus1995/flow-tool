@@ -1,24 +1,21 @@
-package com.sinoiov.zczhgl.flowable.service;
+package com.qu.flowcore.service;
 
-import com.sinoiov.zczhgl.common.response.BaseResponse;
-import com.sinoiov.zczhgl.flowable.entity.param.FlowStartParam;
-import com.sinoiov.zczhgl.flowable.entity.param.FlowTaskDeleteParam;
-import com.sinoiov.zczhgl.flowable.entity.vo.FlowTaskVo;
-import org.flowable.engine.history.HistoricProcessInstance;
+
+import com.qu.flowcore.entity.param.FlowStartParam;
+import com.qu.flowcore.entity.param.FlowTaskDeleteParam;
+import com.qu.flowcore.entity.vo.FlowTaskVo;
 
 public interface FlowInstanceService {
 
+    Boolean startProcessInstance(FlowStartParam param);
 
+    Boolean deleteProcessInstance(FlowTaskDeleteParam param);
 
-    BaseResponse<String> startProcessInstance(FlowStartParam param);
+    Boolean activateProcessInstanceById(String processInstanceId);
 
-    BaseResponse deleteProcessInstance(FlowTaskDeleteParam param);
+    Boolean suspendProcessInstanceById(String processInstanceId);
 
-    BaseResponse activateProcessInstanceById(String processInstanceId);
-
-    BaseResponse suspendProcessInstanceById(String processInstanceId);
-
-    //本来想写终止流程的，一期项目暂时不涉及到，而且终止流程有一些复杂，暂时跳过
+    //本来想写终止流程的，暂时不涉及到，而且终止流程有一些复杂，暂时跳过
 
     /**
      * 结束流程实例
@@ -35,11 +32,4 @@ public interface FlowInstanceService {
      */
     void delete(String instanceId, String deleteReason);
 
-    /**
-     * 根据实例ID查询历史实例数据
-     *
-     * @param processInstanceId
-     * @return
-     */
-    HistoricProcessInstance getHistoricProcessInstanceById(String processInstanceId);
 }

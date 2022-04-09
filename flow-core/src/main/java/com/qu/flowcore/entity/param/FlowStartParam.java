@@ -1,4 +1,4 @@
-package com.sinoiov.zczhgl.flowable.entity.param;
+package com.qu.flowcore.entity.param;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -13,8 +13,8 @@ import java.util.Map;
 /**
  * 启动流程实例接口入参
  *
- * @author zhangkaiyong
- * @date 2021/08/04 18:27
+ * @author qu
+ * @date 2021/12/03
  */
 @Data
 @AllArgsConstructor

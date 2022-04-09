@@ -1,9 +1,6 @@
-package com.sinoiov.zczhgl.flowable.service;
+package com.qu.flowcore.service;
 
-import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.engine.*;
-import org.flowable.validation.ProcessValidatorFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +9,7 @@ import javax.annotation.Resource;
 /**
  * @Description: 注入flowable engine的service。flowable框架主要通过以下service进行控制
  * @author: qu
- * @date: 2021.05.19.15:40
+ * @date: 2021.11.10
  */
 
 @Component

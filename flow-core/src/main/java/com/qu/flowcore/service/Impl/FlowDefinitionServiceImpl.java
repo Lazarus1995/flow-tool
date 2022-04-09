@@ -1,14 +1,10 @@
-package com.sinoiov.zczhgl.flowable.service.impl;
+package com.qu.flowcore.service.Impl;
 
-import com.sinoiov.zc.common.idempotence.Idempotent;
-import com.sinoiov.zczhgl.common.exception.BaseException;
-import com.sinoiov.zczhgl.common.response.BaseResponse;
-import com.sinoiov.zczhgl.flowable.entity.dto.FlowProcDefDto;
-import com.sinoiov.zczhgl.flowable.entity.vo.ModelInfoVo;
-import com.sinoiov.zczhgl.flowable.service.FlowDefinitionService;
-import com.sinoiov.zczhgl.flowable.service.FlowService;
-import enums.FlowableExceptionCode;
-import org.apache.commons.collections.CollectionUtils;
+import com.qu.flowcore.entity.dto.FlowProcDefDto;
+import com.qu.flowcore.entity.vo.ModelInfoVo;
+import com.qu.flowcore.enums.FlowableExceptionCode;
+import com.qu.flowcore.service.FlowDefinitionService;
+import com.qu.flowcore.service.FlowService;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
@@ -21,8 +17,8 @@ import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
 import org.flowable.validation.ValidationError;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
@@ -36,8 +32,8 @@ import java.util.List;
 /**
  * 流程定义
  *
- * @author XuanXuan
- * @date 2021-04-03
+ * @author qu
+ * @date 2021-11-25
  */
 @Service
 public class FlowDefinitionServiceImpl extends FlowService implements FlowDefinitionService {
@@ -49,7 +45,7 @@ public class FlowDefinitionServiceImpl extends FlowService implements FlowDefini
 //    private ProcessValidatorFactory processValidatorFactory;
 
     @Override
-    public boolean exist(String processDefinitionKey) {
+    public Boolean exist(String processDefinitionKey) {
         ProcessDefinitionQuery processDefinitionQuery
                 = repositoryService.createProcessDefinitionQuery().processDefinitionKey(processDefinitionKey);
         long count = processDefinitionQuery.count();
@@ -63,7 +59,7 @@ public class FlowDefinitionServiceImpl extends FlowService implements FlowDefini
      * 注意返回值中的name、key，对应的是bpmn文件中的name。在部署时输入的resourceName自动增加bpmn后缀
      */
     @Override
-    public BaseResponse getProcessDefinition(ModelInfoVo modelInfoVo) {
+    public Boolean getProcessDefinition(ModelInfoVo modelInfoVo) {
         try {
             //组合查询条件，租户ID为必填，流程图名字和分类使用精确查询
             ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionVersion().desc();
@@ -88,11 +84,12 @@ public class FlowDefinitionServiceImpl extends FlowService implements FlowDefini
                     resultList.add(flowProcDefDto);
                 });
             }
-            return BaseResponse.success(resultList);
+            //todo 没写返回值
+            return Boolean.TRUE;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return BaseResponse.success();
+        return Boolean.FALSE;
     }
 
     /**
@@ -103,14 +100,14 @@ public class FlowDefinitionServiceImpl extends FlowService implements FlowDefini
      * @return
      */
     @Override
-    public BaseResponse<String> importBpmnModel(ModelInfoVo modelInfoVo){
+    public Boolean importBpmnModel(ModelInfoVo modelInfoVo){
         InputStream in = null;
         try{
             //转换为XML对象
             in = modelInfoVo.getFile().getInputStream();
             String fileName = modelInfoVo.getFile().getOriginalFilename();
             if(!fileName.endsWith(".bpmn20.xml")){
-                //throw new BaseException();
+                //throw new RuntimeException();
                 return BaseResponse.fail("请上传后缀为.bpmn20.xml的文件");
             }
             XMLInputFactory xif = XmlUtil.createSafeXmlInputFactory();
@@ -120,11 +117,11 @@ public class FlowDefinitionServiceImpl extends FlowService implements FlowDefini
             BpmnModel bpmnModel = new BpmnXMLConverter().convertToBpmnModel(xtr);
             bpmnModel.setTargetNamespace(BaseBpmnJsonConverter.NAMESPACE);
             if (CollectionUtils.isEmpty(bpmnModel.getProcesses())) {
-                throw new BaseException(FlowableExceptionCode.BPMN_PROCESSES_EXCEPTION.getCode(),FlowableExceptionCode.BPMN_PROCESSES_EXCEPTION.getMsg());
+                throw new RuntimeException(FlowableExceptionCode.BPMN_PROCESSES_EXCEPTION.getCode(),FlowableExceptionCode.BPMN_PROCESSES_EXCEPTION.getMsg());
                 //return BaseResponse.fail(FlowableExceptionCode.BPMN_PROCESSES_EXCEPTION.getCode(),FlowableExceptionCode.BPMN_PROCESSES_EXCEPTION.getMsg());
             }
             if (bpmnModel.getLocationMap().size() == 0) {
-                throw new BaseException(FlowableExceptionCode.BPMN_LOCATIONMAP_EXCEPTION.getCode(),FlowableExceptionCode.BPMN_LOCATIONMAP_EXCEPTION.getMsg());
+                throw new RuntimeException(FlowableExceptionCode.BPMN_LOCATIONMAP_EXCEPTION.getCode(),FlowableExceptionCode.BPMN_LOCATIONMAP_EXCEPTION.getMsg());
                  //return BaseResponse.fail(FlowableExceptionCode.BPMN_LOCATIONMAP_EXCEPTION.getCode(),FlowableExceptionCode.BPMN_LOCATIONMAP_EXCEPTION.getMsg());
             }
             //模板验证
@@ -133,7 +130,7 @@ public class FlowDefinitionServiceImpl extends FlowService implements FlowDefini
             if (CollectionUtils.isNotEmpty(validationErrors)) {
                 StringBuffer message = new StringBuffer();
                 validationErrors.forEach(validationError -> message.append(validationError.getDefaultDescription()));
-                throw new BaseException(FlowableExceptionCode.BPMN_FILE_READ_EXCEPTION.getCode(),String.format(FlowableExceptionCode.BPMN_FILE_READ_EXCEPTION.getMsg(),message));
+                throw new RuntimeException(FlowableExceptionCode.BPMN_FILE_READ_EXCEPTION.getCode(),String.format(FlowableExceptionCode.BPMN_FILE_READ_EXCEPTION.getMsg(),message));
                 //return BaseResponse.fail(FlowableExceptionCode.BPMN_FILE_READ_EXCEPTION.getCode(),String.format(FlowableExceptionCode.BPMN_FILE_READ_EXCEPTION.getMsg(),message));
             }
 
@@ -144,7 +141,7 @@ public class FlowDefinitionServiceImpl extends FlowService implements FlowDefini
             ProcessDefinition definition = repositoryService.createProcessDefinitionQuery().deploymentId(deploy.getId()).singleResult();
             repositoryService.setProcessDefinitionCategory(definition.getId(), modelInfoVo.getCategory());
         }catch (Exception e) {
-            //throw new BaseException(FlowableExceptionCode.BPMN_FILE_EXCEPTION.getCode(),FlowableExceptionCode.BPMN_FILE_EXCEPTION.getMsg());
+            //throw new RuntimeException(FlowableExceptionCode.BPMN_FILE_EXCEPTION.getCode(),FlowableExceptionCode.BPMN_FILE_EXCEPTION.getMsg());
             e.printStackTrace();
         }finally {
             try {
@@ -155,7 +152,7 @@ public class FlowDefinitionServiceImpl extends FlowService implements FlowDefini
                 e.printStackTrace();
             }
         }
-        return BaseResponse.success();
+        return Boolean.TRUE;
     }
 
     @Override
@@ -165,28 +162,26 @@ public class FlowDefinitionServiceImpl extends FlowService implements FlowDefini
     }
 
     @Override
-    @Idempotent
-    public BaseResponse activateProcessDefinitionInstanceById(String deployId) {
+    public Boolean activateProcessDefinitionInstanceById(String deployId) {
         try {
             ProcessDefinition procDef = repositoryService.createProcessDefinitionQuery().deploymentId(deployId).singleResult();
             repositoryService.activateProcessDefinitionById(procDef.getId(), true, null);
-            return BaseResponse.success();
+            return Boolean.TRUE;
         } catch (Exception e) {
             e.printStackTrace();
-            return BaseResponse.fail("激活失败");
+            return Boolean.FALSE;
         }
     }
 
     @Override
-    @Idempotent
-    public BaseResponse suspendProcessDefinitionInstanceById(String deployId) {
+    public Boolean suspendProcessDefinitionInstanceById(String deployId) {
         try {
             ProcessDefinition procDef = repositoryService.createProcessDefinitionQuery().deploymentId(deployId).singleResult();
             repositoryService.suspendProcessDefinitionById(procDef.getId(), true, null);
-            return BaseResponse.success();
+            return Boolean.TRUE;
         } catch (Exception e) {
             e.printStackTrace();
-            return BaseResponse.fail("挂起失败");
+            return Boolean.FALSE;
         }
     }
 
